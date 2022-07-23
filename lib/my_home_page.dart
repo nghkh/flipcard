@@ -14,22 +14,28 @@ class _HomePageState extends State<HomePage> {
   bool flip = false;
   bool isFinish = false;
   final List<Data> data = [
-    Data(key: '1', images: Image.asset('/assets/dino.png')),
-    Data(key: '1', images: Image.asset('/assets/dino.png')),
-    Data(key: '2', images: Image.asset('/assets/fish.png')),
-    Data(key: '2', images: Image.asset('/assets/fish.png')),
-    Data(key: '3', images: Image.asset('/assets/frog.png')),
-    Data(key: '3', images: Image.asset('/assets/frog.png')),
-    Data(key: '4', images: Image.asset('/assets/octo.png')),
-    Data(key: '4', images: Image.asset('/assets/octo.png')),
-    Data(key: '5', images: Image.asset('/assets/rabbit.png')),
-    Data(key: '5', images: Image.asset('/assets/rabbit.png')),
-    Data(key: '6', images: Image.asset('/assets/wolf.png')),
-    Data(key: '6', images: Image.asset('/assets/wolf.png')),
+    Data(key: '1', images: Image.asset('assets/dino.png')),
+    Data(key: '1', images: Image.asset('assets/dino.png')),
+    Data(key: '2', images: Image.asset('assets/fish.png')),
+    Data(key: '2', images: Image.asset('assets/fish.png')),
+    Data(key: '3', images: Image.asset('assets/frog.png')),
+    Data(key: '3', images: Image.asset('assets/frog.png')),
+    Data(key: '4', images: Image.asset('assets/octo.png')),
+    Data(key: '4', images: Image.asset('assets/octo.png')),
+    Data(key: '5', images: Image.asset('assets/rabbit.png')),
+    Data(key: '5', images: Image.asset('assets/rabbit.png')),
+    Data(key: '6', images: Image.asset('assets/wolf.png')),
+    Data(key: '6', images: Image.asset('assets/wolf.png')),
   ];
-
+  List<Widget> listImage (){
+    return data.map((e) => e.images).toList();
+  }
   @override
-  
+  void initState() {
+    data.shuffle();
+    // TODO: implement initState
+    super.initState();
+  }
   // Widget getItem(int index) {
   //   return Container(
   //     decoration: BoxDecoration(
@@ -54,9 +60,9 @@ class _HomePageState extends State<HomePage> {
             crossAxisCount: 4,
           ),
               itemBuilder: (context, index){
-            return data.map<Widget>((e) => e.images);
+            return listImage()[index];
               },
-          itemCount: data.length,),
+          itemCount: listImage().length,),
         )
         );
 

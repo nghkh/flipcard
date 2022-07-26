@@ -1,7 +1,6 @@
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
-import 'data.dart';
-// import 'dart:async';
+import 'items.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,146 +10,95 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool flip = false;
   bool isFinish = false;
   bool start = false;
-  int previousIndex = -1;
-  bool wait = false;
-  // List<bool> cardFlips;
-  late List<GlobalKey<FlipCardState>> cardStateKeys;
-  FlipCardController _controller;
 
-  List<GlobalKey<FlipCardState>> getCardStateKeys() {
-    List<GlobalKey<FlipCardState>> cardStateKeys = [];
-    for (int i = 0; i < listImage().length ; i++) {
-      cardStateKeys.add(GlobalKey<FlipCardState>());
-    }
-    return cardStateKeys;
-  }
-
-  final List<Data> data = [
-    Data(key: '1', images: Image.asset('assets/dino.png')),
-    Data(key: '1', images: Image.asset('assets/dino.png')),
-    Data(key: '2', images: Image.asset('assets/fish.png')),
-    Data(key: '2', images: Image.asset('assets/fish.png')),
-    Data(key: '3', images: Image.asset('assets/frog.png')),
-    Data(key: '3', images: Image.asset('assets/frog.png')),
-    Data(key: '4', images: Image.asset('assets/octo.png')),
-    Data(key: '4', images: Image.asset('assets/octo.png')),
-    Data(key: '5', images: Image.asset('assets/rabbit.png')),
-    Data(key: '5', images: Image.asset('assets/rabbit.png')),
-    Data(key: '6', images: Image.asset('assets/wolf.png')),
-    Data(key: '6', images: Image.asset('assets/wolf.png')),
-  ];
-
-  List<Widget> listImage() {
-    return data.map((e) => e.images).toList();
-  }
-
-  Widget getItem(int index) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.grey[100], borderRadius: BorderRadius.circular(5)),
-      margin: const EdgeInsets.all(4.0),
-      child: listImage()[index],
-    );
-  }
-
-  void restart() {
-    data.shuffle();
-    isFinish = false;
-    start = true;
-  }
+  final items = <Item>[];
 
   @override
   void initState() {
-    data.shuffle();
-    isFinish = false;
-    start = true;
+    items.addAll([
+      Item(code: 'dino', photo: 'assets/dino.png'),
+      Item(code: 'dino', photo: 'assets/dino.png'),
+      Item(code: 'fish', photo: 'assets/fish.png'),
+      Item(code: 'fish', photo: 'assets/fish.png'),
+      Item(code: 'wolf', photo: 'assets/wolf.png'),
+      Item(code: 'wolf', photo: 'assets/wolf.png'),
+    ]);
+    items.shuffle();
     // TODO: implement initState
     super.initState();
-    _controller: FlipCardController();
-
   }
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext ctx) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flip Cards Game'),
+        title: Text('Card'),
         centerTitle: true,
       ),
-      body: isFinish
-          ? Center(
-        child: GestureDetector(
-          onTap: () {
-            setState(() {
-              restart();
-            });
-          },
-          child: Container(
-            height: 50,
-            width: 200,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: const Text(
-              "Replay",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w500),
-            ),
-          ),
+      body: Center(child: isFinish ? toRestart() : buildBody()),
+    );
+  }
+
+  Widget toRestart() {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          items.shuffle();
+          isFinish = false;
+        });
+      },
+      child: Container(
+        height: 50,
+        width: 200,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(24),
         ),
-      )
-          : SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                  ),
-                  itemBuilder: (context, index) => start
-                      ? FlipCard(
-                      controller: _controller,
-                      front: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        margin: const EdgeInsets.all(4.0),
-                        child: Text(
-                          '?',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 40,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      back: getItem(index))
-                      : getItem(index),
-                  itemCount: listImage().length,
-                ),
-              )
-            ],
-          ),
+        child: Text(
+          'Replay',
+          style: TextStyle(
+              color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
         ),
       ),
     );
   }
+
+  Widget buildBody() {
+    return Container(
+      child: GridView.builder(
+          padding: EdgeInsets.all(16),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+          ),
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return start
+                ? FlipCard(
+                front: buildFront(),
+                back: buildBack(item),)
+            : buildBack(item);
+          },
+      itemCount: items.length,),
+    );
+  }
+
+  Widget buildFront(){
+    return Container(
+      alignment: Alignment.center,
+      child: Text('?',
+      style: Theme.of(context).textTheme.headline6,),
+    );
+  }
+
+  Widget buildBack(Item items){
+    return Container(
+      child: Image.asset(items.photo)
+    );
+  }
+
 }
